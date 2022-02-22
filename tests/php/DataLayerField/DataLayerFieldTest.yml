@@ -1,0 +1,4 @@
+SilverStripe\DataLayer\Tests\DataLayerField\BasicModel:
+  model1:
+    Title: Model1
+    Location: 10

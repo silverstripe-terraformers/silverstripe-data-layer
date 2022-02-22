@@ -6,8 +6,7 @@ use SilverStripe\Dev\Debug;
 use SilverStripe\View\TemplateGlobalProvider;
 
 /**
- * The current expectation is to use a component ID to get a component specification
- * and to pass through a data object to add values to the specification.
+ * Template helper methods to provide easy access to data layer methods
  */
 class TemplateHelper implements TemplateGlobalProvider
 {
@@ -15,7 +14,6 @@ class TemplateHelper implements TemplateGlobalProvider
     {
         return [
             'GenericDataLayerAttributes' => ['method' => 'getGenericDataLayerAttributes', 'casting' => 'HTMLText'],
-            'CastToNumeric' => ['method' => 'castToNumeric', 'casting' => 'Int'],
         ];
     }
 
@@ -32,19 +30,6 @@ class TemplateHelper implements TemplateGlobalProvider
             return null;
         }
 
-        return DataLayerField::create('DataLayerField')->setComponentKey($componentKey);
-    }
-
-    /**
-     * Cast a value to a numeric string
-     *
-     * @param mixed $value
-     * @return string
-     */
-    public static function castToNumeric($value): string
-    {
-        $value = (int) $value;
-
-        return (string) $value;
+        return DataLayerField::create('data-layer-field-generic')->setComponentKey($componentKey);
     }
 }

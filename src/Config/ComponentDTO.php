@@ -6,8 +6,7 @@ use SilverStripe\Core\Injector\Injectable;
 
 /**
  * This is a representation of the component from a specification
- * It's a pretty dumb DTO with a little smarts around resolving its dependencies
- * from a @see Manifest
+ * this component is cached in-memory via @see Manifest
  */
 class ComponentDTO
 {
@@ -63,10 +62,10 @@ class ComponentDTO
         }
     }
 
-    /*
-     * Called after the manifest has added all components DTOs to allow
-     * us to extend component definitions from the manifest and add their
-     * fields to our fields
+    /**
+     * Adds inherited field defined in the parent component
+     *
+     * @param ComponentDTO $component
      */
     public function buildExtensions(ComponentDTO $component): void
     {
@@ -76,7 +75,7 @@ class ComponentDTO
 
         foreach ($component->getFields() as $fieldId => $field) {
             if (array_key_exists($fieldId, $this->fields)) {
-                // We've already overwritten this field
+                // We've already overwritten this field - bail out
                 continue;
             }
 
@@ -90,21 +89,33 @@ class ComponentDTO
         $this->interactions = array_unique($this->interactions);
     }
 
+    /**
+     * @return string
+     */
     public function getComponentKey(): string
     {
         return $this->componentKey;
     }
 
+    /**
+     * @return Field[]
+     */
     public function getFields(): array
     {
         return $this->fields;
     }
 
+    /**
+     * @return string[]
+     */
     public function getInteractions(): array
     {
         return $this->interactions;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExtends(): ?string
     {
         return $this->extends;
