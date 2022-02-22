@@ -1,0 +1,32 @@
+@import '../core/variables';
+
+/**
+ * Mixin to allow easy use of icons.
+ *
+ * @example
+ * .btn {
+ *   &::after {
+ *     @include icon(my-icon, 16px, 16px)
+ *   }
+ * }
+ */
+@mixin icon($icon, $width: 24px, $height: 24px) {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+  vertical-align: middle;
+  height: $height;
+  width: $width;
+  background-image: url('#{$icon-path}/#{$icon}.svg');
+  content: '';
+}
+
+@mixin heading-link() {
+  color: $color-blue;
+
+  &:hover {
+    color: $color-red;
+    text-decoration: none;
+  }
+}

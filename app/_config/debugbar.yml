@@ -1,0 +1,9 @@
+---
+Name: app_debugbar
+After: '#debugbar'
+Only:
+  environment: 'dev'
+---
+LeKoala\DebugBar\DebugBar:
+  enabled_in_admin: false
+  check_local_ip: false

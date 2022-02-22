@@ -1,0 +1,47 @@
+/**
+ * We must include our variables before bootstrap,
+ * otherwise bootstrap overrides our values.
+ */
+
+@import 'core/variables';
+
+/**
+ * Include bootstrap functionality as needed.
+ */
+
+// Include functions first (so you can manipulate colors, SVGs, calc, etc)
+@import '~bootstrap/scss/functions';
+
+// Include any default variable overrides here
+
+// Include remainder of required Bootstrap stylesheets
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+
+// Include any optional Bootstrap components as you like
+@import '~bootstrap/scss/root';
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/images';
+@import '~bootstrap/scss/containers';
+@import '~bootstrap/scss/grid';
+@import '~bootstrap/scss/utilities';
+
+// Utilities
+@import '~bootstrap/scss/utilities/api';
+
+/**
+ * Include core theme styles
+ */
+@import 'core/mixins';
+@import 'core/accessibility';
+@import 'core/fonts';
+@import 'core/typography';
+@import 'core/animations';
+@import 'core/responsive-video';
+
+/**
+ * Include components
+ */
+@import 'components/flyout-panel';
+@import 'components/meganav';

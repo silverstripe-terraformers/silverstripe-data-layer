@@ -1,0 +1,7 @@
+php_settings:
+  version: 7.4
+crons:
+  queuedjobs_task:
+    time: '* * * * *'
+    sake_once: "dev/tasks/ProcessJobQueueTask"
+    vhost: "mysite"

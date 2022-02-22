@@ -1,0 +1,6 @@
+---
+name: app-admin
+---
+SilverStripe\Forms\HTMLEditor\TinyMCEConfig:
+  editor_css:
+    - 'themes/app/dist/editor.css'

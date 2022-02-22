@@ -1,0 +1,18 @@
+.embed {
+  height: 0;
+  position: relative;
+  width: 100%;
+
+  iframe {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+
+  &__caption {
+    font-size: 1.6rem;
+    padding: 0.5rem 0 2.5rem;
+  }
+}

@@ -1,0 +1,24 @@
+/**
+ * We must include our variables before bootstrap,
+ * otherwise bootstrap overrides our values.
+ */
+
+@import 'core/variables';
+@import 'core/mixins';
+
+/**
+ * Include bootstrap functionality as needed.
+ */
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/root';
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/utilities';
+
+/**
+ * Add project specific typography
+ */
+@import 'core/fonts';
+@import 'core/typography';

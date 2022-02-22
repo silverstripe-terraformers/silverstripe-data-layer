@@ -1,0 +1,135 @@
+@import '~bootstrap/scss/mixins/breakpoints';
+@import '../core/variables';
+
+.mega-nav {
+  display: none;
+
+  @include media-breakpoint-up(lg) {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__overlay {
+    display: none;
+    width: 100%;
+    border-top: 0.1rem solid $color-grey-dark;
+    position: absolute;
+    left: 0;
+    margin-top: 2.4rem;
+    z-index: 20;
+    height: 100%;
+    background: rgba($black, 0.5);
+  }
+
+  &__content {
+    background: $color-white;
+    padding-top: $meganav-padding-y;
+    padding-bottom: $meganav-padding-y;
+  }
+
+  &__link {
+    position: relative;
+    padding-right: 2.0rem;
+  }
+
+  /**
+   * These after & before blocks build an arrow above the mega menu. The arrow
+   * is composed of one triangle with another smaller triangle layered over the top
+   * to give the effect of a bordered triangle.
+   *
+   * ::after is the top triangle
+   * ::before is the bottom triangle
+   */
+  &__item &__link::after {
+    display: none;
+    border-left: 1.2rem solid transparent;
+    border-right: 1.2rem solid transparent;
+    border-top: 1.2rem solid $white;
+    content: '';
+    position: absolute;
+    bottom: -4.1rem;
+    right: 50%;
+    transform: rotate(180deg) translateX(-50%);
+    transform: rotate(180deg) translateX(calc(-50% - 2.0rem));
+    transform-origin: top left;
+    z-index: 30;
+  }
+
+  &__item &__link::before {
+    display: none;
+    border-left: 1.3rem solid transparent;
+    border-right: 1.3rem solid transparent;
+    border-top: 1.3rem solid $color-grey-dark;
+    content: '';
+    position: absolute;
+    bottom: -4.1rem;
+    right: calc(50% - 0.2rem);
+    transform: rotate(180deg) translateX(-50%);
+    transform: rotate(180deg) translateX(calc(-50% - 2.0rem));
+    transform-origin: top left;
+    z-index: 30;
+  }
+
+  &__item {
+    padding: 0;
+    margin: 0;
+
+    &--with-children::after {
+      @include icon('chev-down', 8px, 5px);
+
+      transition: transform 0.2s;
+      margin-left: 0.4rem;
+      margin-top: -0.2rem;
+      position: relative;
+      left: -2.0rem;
+    }
+
+    &--current .mega-nav__link {
+      color: $color-primary;
+      font-weight: $font-weight-bold;
+    }
+
+    &--open,
+    &:hover,
+    &:focus {
+      .mega-nav__link {
+        color: $color-primary;
+      }
+    }
+
+    &--open.mega-nav__item--with-children::after {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__item:not(.mega-nav__item--immediate) &__link::before {
+    animation: fadeIn $meganav-animation-time ease-in;
+  }
+
+  /* stylelint-disable no-descending-specificity */
+  &__item--open &__overlay,
+  &__item--open &__link::after,
+  &__item--open &__link::before,
+  &__item--closing &__link::after,
+  &__item--closing &__link::before {
+    display: block;
+  }
+
+  &__item--closing &__overlay {
+    display: block;
+  }
+
+  &__item--open:not(.mega-nav__item--immediate) &__overlay,
+  &__item--open:not(.mega-nav__item--immediate) &__link::before {
+    animation: fadeIn $meganav-animation-time ease-in;
+  }
+
+  &__item--closing:not(.mega-nav__item--immediate) &__overlay,
+  &__item--closing:not(.mega-nav__item--immediate) &__link::before {
+    animation: fadeOut $meganav-animation-time ease-in;
+  }
+  /* stylelint-enable no-descending-specificity */
+}

@@ -1,0 +1,6 @@
+PATH="vendor/bin:$PATH"
+
+alias dbf="vendor/bin/sake dev/build flush=all"
+
+alias enxdebug="sudo phpenmod xdebug && sudo service apache2 restart"
+alias disxdebug="sudo phpdismod xdebug && sudo service apache2 restart"

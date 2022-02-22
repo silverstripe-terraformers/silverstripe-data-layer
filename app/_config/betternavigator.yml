@@ -1,0 +1,12 @@
+---
+Name: better_navigator
+Only:
+  environment: 'dev'
+---
+BetterNavigator:
+  # Set transparency
+  translucent: false
+  # Move BetterNavigator to BetterPosition
+  position: 'right-top'
+  # or
+  # position: 'left-bottom'

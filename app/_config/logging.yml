@@ -1,0 +1,16 @@
+---
+Name: sysloglogging
+After: '#logging'
+Except:
+  moduleexists: 'cwp/cwp-core'
+---
+# This logging config lives in/is taken from `cwp/cwp-core`, and we don't want to double enter logs.
+SilverStripe\Core\Injector\Injector:
+  Psr\Log\LoggerInterface:
+    calls:
+      pushSilverStripeSyslogHandler: [ pushHandler, [ '%$Monolog\Handler\HandlerInterface.silverstripe' ] ]
+  # Internal error handler, piped to syslog which is routed to Graylog
+  Monolog\Handler\HandlerInterface.silverstripe:
+    class: Monolog\Handler\SyslogHandler
+    constructor:
+      - 'SilverStripe_log'

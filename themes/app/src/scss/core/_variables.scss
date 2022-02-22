@@ -1,0 +1,54 @@
+/**
+ * Application variables
+ */
+$font-path: '../../fonts' !default;
+$icon-path: '../../icons' !default;
+
+$font-size-base: 1.6rem !default; // ~16px - body font-size set to 10px for easy px-rem conversion
+
+$meganav-padding-y: 3.2rem;
+$meganav-animation-time: 0.3s; // CAUTION: This time is tied to a setTimeout in Meganav.vue
+
+/* Colors */
+$color-blue: var(--blue);
+$color-grey-dark: var(--grey);
+$color-grey-light: #EEE;
+$color-grey-mid: #ADB6B8;
+$color-primary: var(--primary);
+$color-red: var(--red);
+$color-white: var(--white);
+
+/* Font weights */
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+/* Spacing */
+$footer-block-margin-bottom: 3.5rem;
+
+$header-margin-bottom: 0.5em;
+$header-margin-top: 1em;
+
+$h1-margin-bottom: $header-margin-bottom;
+$h1-margin-top: $header-margin-top;
+
+$h2-margin-bottom: $header-margin-bottom;
+$h2-margin-top: $header-margin-top;
+
+$h3-margin-bottom: $header-margin-bottom;
+$h3-margin-top: $header-margin-top;
+
+$h4-margin-bottom: $header-margin-bottom;
+$h4-margin-top: $header-margin-top;
+
+$h5-margin-bottom: $header-margin-bottom;
+$h5-margin-top: $header-margin-top;
+
+$h6-margin-bottom: $header-margin-bottom;
+$h6-margin-top: $header-margin-top;
+
+/**
+ * Bootstrap variable overrides
+ */
