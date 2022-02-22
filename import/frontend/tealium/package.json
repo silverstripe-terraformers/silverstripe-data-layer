@@ -1,0 +1,10 @@
+{
+  "name": "@tnz/tealium",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@tnz/logger": "^1",
+    "@tnz/data-layer": "^1"
+  }
+}

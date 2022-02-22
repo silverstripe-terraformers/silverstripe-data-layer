@@ -1,0 +1,16 @@
+{
+  "name": "@tnz/data-layer",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@tnz/globals": "^1",
+    "@tnz/logger": "^1",
+    "data-layer-helper": "google/data-layer-helper",
+    "lodash": "^4.17.21"
+  }
+}
