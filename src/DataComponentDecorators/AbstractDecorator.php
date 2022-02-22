@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Tracking\DataLayer\DataComponentDecorators;
+namespace SilverStripe\DataLayer\DataComponentDecorators;
 
-use App\Extensions\UniqueIdExtension;
-use App\Tracking\DataLayer\Config\ComponentDTO;
-use App\Tracking\DataLayer\Config\Field;
-use App\Tracking\DataLayer\Config\Manifest;
 use InvalidArgumentException;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\Core\Injector\Injector;
+use SilverStripe\DataLayer\Config\ComponentDTO;
+use SilverStripe\DataLayer\Config\Field;
+use SilverStripe\DataLayer\Config\Manifest;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 
@@ -37,7 +35,7 @@ abstract class AbstractDecorator
     ];
 
     /**
-     * @var DataObject|UniqueIdExtension
+     * @var DataObject
      */
     private $dataObject;
 
@@ -53,7 +51,7 @@ abstract class AbstractDecorator
     }
 
     /**
-     * @return DataObject|UniqueIdExtension|null
+     * @return DataObject|null
      */
     public function getDataObject(): ?DataObject
     {
@@ -78,7 +76,7 @@ abstract class AbstractDecorator
                 $attributes['id'] = $data['ID'];
             } elseif ($this->getDataObject() !== null) {
                 // ID can be taken from model
-                $attributes['id'] = $this->getDataObject()->getUniqueId();
+                $attributes['id'] = $this->getDataObject()->getUniqueKey();
             }
         }
 

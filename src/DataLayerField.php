@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Tracking\DataLayer;
+namespace SilverStripe\DataLayer;
 
-use App\Tracking\DataLayer\DataComponentDecorators\DecoratorService;
 use Serializable;
+use SilverStripe\DataLayer\DataComponentDecorators\DecoratorService;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;

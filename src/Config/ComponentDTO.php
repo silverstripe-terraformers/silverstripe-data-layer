@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tracking\DataLayer\Config;
+namespace SilverStripe\DataLayer\Config;
 
 use SilverStripe\Core\Injector\Injectable;
 

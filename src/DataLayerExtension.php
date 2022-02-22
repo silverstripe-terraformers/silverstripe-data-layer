@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tracking\DataLayer;
+namespace SilverStripe\DataLayer;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\Dev\Debug;
