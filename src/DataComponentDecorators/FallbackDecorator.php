@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tracking\DataLayer\DataComponentDecorators;
+namespace SilverStripe\DataLayer\DataComponentDecorators;
 
 /**
  * This handles anything didn't have a specific decorator
