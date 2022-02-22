@@ -1,12 +1,22 @@
 {
-    "name": "silverstripe-module/skeleton",
-    "description": "A skeleton for SilverStripe modules.",
+    "name": "silverstripe/data-layer",
+    "description": "Consistent and flexible data capture for your website.",
     "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",
         "CMS"
     ],
     "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Mojmir Fendek",
+            "email": "mfendek@silverstripe.com"
+        },
+        {
+            "name": "Bernie Hamlin",
+            "email": "bernie@silverstripe.com"
+        }
+    ],
     "require": {
         "silverstripe/framework": "^4.0",
         "silverstripe/admin": "^1.0"
@@ -17,13 +27,13 @@
     },
     "autoload": {
         "psr-4": {
-            "SilverStripeModule\\Skeleton\\": "src/",
-            "SilverStripeModule\\Skeleton\\Tests\\": "tests/"
+            "SilverStripe\\DataLayer\\": "src/",
+            "SilverStripe\\DataLayer\\Tests\\": "tests/php/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "1.x-dev"
         },
         "expose": [
             "client/dist"
