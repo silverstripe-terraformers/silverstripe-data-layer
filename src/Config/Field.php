@@ -7,12 +7,16 @@ use SilverStripe\Core\Injector\Injectable;
 /**
  * This represents a single field on a component
  * The value is optional and null by default, it's used to represent
- * the hard coded value in component specifications
+ * the default value in component specifications
  */
 class Field
 {
 
     use Injectable;
+
+    public const TYPE_STRING = 'String';
+    public const TYPE_INTEGER = 'Integer';
+    public const TYPE_IDENTIFIER = 'Identifier';
 
     /**
      * @var string

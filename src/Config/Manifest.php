@@ -8,12 +8,12 @@ use SilverStripe\Core\Resettable;
 use SilverStripe\ORM\ValidationException;
 
 /**
- * This is the core of the specifications, it creates each component as a ComponentDTO
+ * This is the core of the specifications, it creates each component as a @see ComponentDTO
  * which then allows you to interact with them via the `getById` which returns a ComponentDTO
  *
  * Caching:
  * - specifications use standard configuration API
- * - component objects are in-memory cached and loaded on demand
+ * - components are in-memory cached and loaded on demand
  */
 class Manifest implements Resettable
 {
@@ -77,7 +77,7 @@ class Manifest implements Resettable
      * @param string $key
      * @throws ValidationException
      */
-    private function composeComponent(string $key): void
+    protected function composeComponent(string $key): void
     {
         $data = $this->getComponentData($key);
         $maxDepth = (int) $this->config()->get('max_hierarchy_depth');
@@ -165,7 +165,7 @@ class Manifest implements Resettable
      * @return array|null
      * @throws ValidationException
      */
-    private function getComponentData(string $key): array
+    protected function getComponentData(string $key): array
     {
         $specifications = (array) $this->config()->get('specifications');
 

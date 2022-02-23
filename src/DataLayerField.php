@@ -10,10 +10,9 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\ValidationException;
 
 /**
- * This field represents unprocessed state of @see DataLayerExtension::DataLayerAttributes()
- * which is still open to new changes (adding of new properties)
- * Note that this field needs to be transformed into a plain field in case we want it to be serialised into data cache
- * by calling getFieldForTemplate() method
+ * This field represents mutable state of @see DataLayerExtension::DataLayerAttributes()
+ * Note that this field needs to be transformed into an immutable field in case we want it
+ * to be serialised into data cache by calling @see DataLayerField::getFieldForTemplate()
  */
 class DataLayerField extends DBHTMLText implements Serializable
 {
@@ -32,6 +31,10 @@ class DataLayerField extends DBHTMLText implements Serializable
      */
     protected $extraProperties = [];
 
+    /**
+     * @param DataObject|null $model
+     * @return $this
+     */
     public function setModel(?DataObject $model): self
     {
         $this->model = $model;
@@ -39,6 +42,10 @@ class DataLayerField extends DBHTMLText implements Serializable
         return $this;
     }
 
+    /**
+     * @param string|null $componentKey
+     * @return $this
+     */
     public function setComponentKey(?string $componentKey): self
     {
         $this->componentKey = $componentKey;
@@ -46,6 +53,10 @@ class DataLayerField extends DBHTMLText implements Serializable
         return $this;
     }
 
+    /**
+     * @param array $properties
+     * @return $this
+     */
     public function addExtraProperties(array $properties): self
     {
         foreach ($properties as $key => $value) {
@@ -55,6 +66,10 @@ class DataLayerField extends DBHTMLText implements Serializable
         return $this;
     }
 
+    /**
+     * @return DBField|null
+     * @throws ValidationException
+     */
     public function getFieldForTemplate(): ?DBField
     {
         return DecoratorService::singleton()->process(
@@ -88,6 +103,7 @@ class DataLayerField extends DBHTMLText implements Serializable
 
     /**
      * @return mixed|string|null
+     * @throws ValidationException
      */
     public function forTemplate()
     {

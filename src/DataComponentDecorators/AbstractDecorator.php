@@ -3,6 +3,7 @@
 namespace SilverStripe\DataLayer\DataComponentDecorators;
 
 use InvalidArgumentException;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injectable;
@@ -11,6 +12,7 @@ use SilverStripe\DataLayer\Config\Field;
 use SilverStripe\DataLayer\Config\Manifest;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\ValidationException;
 
 /**
  * Extend this to implement specific decorators, they enable mapping a field name
@@ -30,9 +32,7 @@ abstract class AbstractDecorator
     /**
      * @var string[]
      */
-    private static $generic_values = [
-        'OperatorName' => 'BusinessKey',
-    ];
+    private static $generic_values = [];
 
     /**
      * @var DataObject
@@ -44,6 +44,10 @@ abstract class AbstractDecorator
      */
     private $componentKey;
 
+    /**
+     * @param string $componentKey
+     * @param DataObject|null $instance
+     */
     public function __construct(string $componentKey, ?DataObject $instance)
     {
         $this->dataObject = $instance;
@@ -58,11 +62,20 @@ abstract class AbstractDecorator
         return $this->dataObject;
     }
 
+    /**
+     * @return ComponentDTO|null
+     * @throws ValidationException
+     */
     public function getComponentConfig(): ?ComponentDTO
     {
         return Manifest::singleton()->getByKey($this->componentKey);
     }
 
+    /**
+     * @param array|null $additionalProperties
+     * @return DBField
+     * @throws ValidationException
+     */
     public function getAttributes(?array $additionalProperties = null): DBField
     {
         $data = $this->produceData($additionalProperties);
@@ -104,6 +117,25 @@ abstract class AbstractDecorator
         return DBField::create_field('HTMLFragment', implode(' ', $parts));
     }
 
+    /**
+     * @param string $type
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function castValue(string $type, $value)
+    {
+        if ($type === Field::TYPE_INTEGER) {
+            return (int) $value;
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * @param array|null $additionalProperties
+     * @return array
+     * @throws ValidationException
+     */
     protected function produceData(?array $additionalProperties = null): array
     {
         $config = $this->getComponentConfig();
@@ -111,28 +143,30 @@ abstract class AbstractDecorator
 
         foreach ($config->getFields() as $field) {
             $key = $field->getKey();
+            $type = $field->getType();
             $dataObject = $this->getDataObject();
 
             $value = $this->getFieldValue($config->getComponentKey(), $field, $dataObject);
 
-            // The value has been declared via the generator
-            if ($value !== self::VALUE_UNDEFINED) {
-                $results[$key] = $value;
+            // Identifier types are expected to be provided via static configuration
+            // These are never populated by other means
+            if ($type === Field::TYPE_IDENTIFIER) {
+                $results[$key] = $this->castValue(Field::TYPE_STRING, $field->getValue());
 
                 continue;
+
             }
 
-            if ($field->getValue() !== null) {
-                // We've got a hardcoded default value, no need
-                // to try and fetch this from the model
-                $results[$key] = $field->getValue();
+            // The value has been declared via the decorator
+            if ($value !== self::VALUE_UNDEFINED) {
+                $results[$key] = $this->castValue($type, $value);
 
                 continue;
             }
 
             if ($additionalProperties && array_key_exists($key, $additionalProperties)) {
                 // Value is provided as an additional property
-                $results[$key] = $additionalProperties[$key];
+                $results[$key] = $this->castValue($type, $additionalProperties[$key]);
 
                 continue;
             }
@@ -141,7 +175,7 @@ abstract class AbstractDecorator
             $mappedValue = $this->getValueFromMapping($key, $dataObject);
 
             if ($mappedValue !== self::VALUE_UNDEFINED) {
-                $results[$key] = $mappedValue;
+                $results[$key] = $this->castValue($type, $mappedValue);
 
                 continue;
             }
@@ -149,7 +183,15 @@ abstract class AbstractDecorator
             // Check if the value is a field on the Data Object
             if ($dataObject && $dataObject->hasField($key)) {
                 // We've got a direct field (or a field populated by other means like an extension or a get method)
-                $results[$key] = $dataObject->{$key};
+                $results[$key] = $this->castValue($type, $dataObject->{$key});
+
+                continue;
+            }
+
+            if ($field->getValue() !== null) {
+                // We've got a hardcoded default value, no need
+                // to try and fetch this from the model
+                $results[$key] = $this->castValue($type, $field->getValue());
 
                 continue;
             }
@@ -188,7 +230,7 @@ abstract class AbstractDecorator
      * Represents the combination of generic values and component values
      * for the specified component
      */
-    private function getMapping(?string $componentKey = null): array
+    protected function getMapping(?string $componentKey = null): array
     {
         $genericValues = $this->config()->get('generic_values');
 
@@ -212,10 +254,11 @@ abstract class AbstractDecorator
      * Based on a key, get the value for the mapping
      *
      * @param string $key
-     * @param DataObject $dataObject
+     * @param DataObject|null $dataObject
      * @return mixed|DataObject|DBField|null
+     * @throws ValidationException
      */
-    private function getValueFromMapping(string $key, ?DataObject $dataObject)
+    protected function getValueFromMapping(string $key, ?DataObject $dataObject)
     {
         $mapping = $this->getMapping($this->getComponentConfig()->getComponentKey());
 

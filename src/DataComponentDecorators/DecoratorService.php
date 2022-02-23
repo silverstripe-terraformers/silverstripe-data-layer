@@ -8,6 +8,7 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\ValidationException;
 
 /**
  * This maps component ID's to decorators and their outputs
@@ -24,6 +25,7 @@ class DecoratorService
     /**
      * @var array
      * @config
+     * 'component_key' => 'decorator_class_name'
      */
     private static $decorators = [];
 
@@ -35,6 +37,7 @@ class DecoratorService
      * @param DataObject|null $dataObject the instance of an object if required
      * @param array|null $additionalProperties
      * @return DBField
+     * @throws ValidationException
      */
     public function process(
         string $type,
@@ -54,7 +57,7 @@ class DecoratorService
         return $decorator->getAttributes($additionalProperties);
     }
 
-    private function getDecorator(string $componentKey, ?DataObject $dataObject = null): AbstractDecorator
+    protected function getDecorator(string $componentKey, ?DataObject $dataObject = null): AbstractDecorator
     {
         $decorators = (array) $this->config()->get('decorators');
         $missingDecoratorMapping = !array_key_exists($componentKey, $decorators);
