@@ -33,6 +33,91 @@ This achieves our goal as all the required data will be collected.
 This approach allows you to avoid complex data lookups on your components as the components can usually match your models.
 The consequence of this, we can keep a clean separation of concerns and thus the code is easier to maintain.
 
+## How to identify component data source
+
+There are quite a few options when it comes to providing data for your components.
+The simplest one is raw data via the template.
+This is pretty straightforward, but it may not be suitable for cases where components require a lot of fields as we want to avoid cluttering the template with data lookups.
+
+Components can use models or just objects (`ViewableData`) as data source.
+Note that a single component can have different sources in different contexts, imagine this as a many-many relation between components and their data sources.
+
+For example a link component can use page as data source but also a link object.
+Looking at it from other direction, a single page can expose different data sets to different components.
+
+To allow flexible mapping, this module provides several options for these cases.
+
+### Field resolution priority
+
+It's important to understand the field resolution priority in order to set up the right mapping rules.
+Overall approach is that more specific rules override generic rules.
+
+#### How field value is determined for components without source object
+
+1. Identifier field type - special hard coded fields
+2. Additional properties - raw data provided via template
+3. Directly from decorator - decorator provides data directly
+4. From default value - default value is part of the component definition
+
+If none of the above yields any values an exception is thrown.
+
+##### Decorator resolution
+
+1. `DecoratorService` will try to find a decorator based on the `decorators` configuration
+2. If no decorator is found `FallbackDecorator` will be used instead
+
+#### How field value is determined for components from source object
+
+1. Identifier field type - special hard coded fields
+2. Additional properties - raw data provided via template
+3. Directly from decorator - decorator provides data directly
+4. Field mapping - decorator provides a map for source object fields and component fields
+5. Object fallback - those source object fields which match component fields will be matched implicitly
+6. From default value - default value is part of the component definition
+
+If none of the above yields any values an exception is thrown.
+
+##### Decorator resolution
+
+1. Source object can have `data_layer_decorators` configuration which can have decorator specification
+2. Source object can have `data_layer_decorators` configuration which can have explicit field mapping, `FallbackDecorator` will be used in such case
+3. `DecoratorService` will try to find a decorator based on the `decorators` configuration
+4. If no decorator is found `FallbackDecorator` will be used instead
+
+##### Field mapping resolution
+
+1. If `FallbackDecorator` is in use, it will have an explicit field map which will be used over any generic rules
+2. Decorator in use provides `field_map` which is used to map properties which didn't match the rule above
+
+#### Which data source to use in what situation?
+
+**Additional properties**
+
+Great for simple components which don't have any object data sources and have only a few fields.
+For example: Link components with `href` and `title`.
+
+**Decorator value**
+
+Suitable for a group of objects of different type that need some custom data transformation.
+For example: We have a page and a block and both need a transformation of their data based on some global state like a feature flag.
+
+**Mapping from data source**
+
+This is probably the most common one used as it covers field mapping between objects and components.
+For example: Page has a `Heading` field and this needs to be mapped to Component field `Title`.
+
+**Implicit mapping**
+
+In case the object and component fields names match, you don't need an explicit mapping.
+For example: Page has a `Title` field and this needs to be mapped to Component field `Title`.
+
+**Default value**
+
+Default values are handy in case use need hard coded values to be passed, or you just have a value which covers most cases.
+The minority case can be overridden via additional properties feature (typically done via template).
+
+# TODO the section below needs updating
+
 ## Component specifications
 
 To register a component we need to configure our component manifest.
@@ -199,7 +284,7 @@ Inheritance chain depth is limited but configurable via `max_hierarchy_depth`.
 
 ### Configuration file structure
 
-You may be tempted to put all your component specifications into a single `yaml` file but it is recommended to keep the configuration files well-structured as it makes the files easier to maintain.
+You may be tempted to put all your component specifications into a single `yaml` file, but it is recommended to keep the configuration files well-structured as it makes the files easier to maintain.
 All files need to be placed under your `_config` folder but the underlying file / folder structure can be arbitrary.
 
 Example below shows a simple structure that separates generic components and specific components.
@@ -370,7 +455,7 @@ This approach should be used for exceptional cases though.
 #### Recommended component hierarchy
 
 Component hierarchy shouldn't be too shallow or too deep.
-Balanced hirarchy example below:
+Balanced hierarchy example below:
 
 ```
 Page - root component

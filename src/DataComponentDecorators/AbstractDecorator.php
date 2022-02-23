@@ -2,17 +2,18 @@
 
 namespace SilverStripe\DataLayer\DataComponentDecorators;
 
+use Exception;
 use InvalidArgumentException;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\DataLayer\Config\ComponentDTO;
 use SilverStripe\DataLayer\Config\Field;
 use SilverStripe\DataLayer\Config\Manifest;
-use SilverStripe\ORM\DataObject;
+use SilverStripe\DataLayer\DataLayerExtension;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\View\ViewableData;
 
 /**
  * Extend this to implement specific decorators, they enable mapping a field name
@@ -30,14 +31,19 @@ abstract class AbstractDecorator
     public const VALUE_UNDEFINED = 'AbstractGenerator::VALUE_UNDEFINED';
 
     /**
+     * Mapping of source object fields and component fields
+     * Format:
+     * 'component_field' => 'source_object_field'
+     *
      * @var string[]
+     * @config
      */
-    private static $generic_values = [];
+    private static $field_map = [];
 
     /**
-     * @var DataObject
+     * @var ViewableData
      */
-    private $dataObject;
+    private $sourceObject;
 
     /**
      * @var string
@@ -46,20 +52,20 @@ abstract class AbstractDecorator
 
     /**
      * @param string $componentKey
-     * @param DataObject|null $instance
+     * @param ViewableData|null $instance
      */
-    public function __construct(string $componentKey, ?DataObject $instance)
+    public function __construct(string $componentKey, ?ViewableData $instance)
     {
-        $this->dataObject = $instance;
+        $this->sourceObject = $instance;
         $this->componentKey = $componentKey;
     }
 
     /**
-     * @return DataObject|null
+     * @return ViewableData|DataLayerExtension|null
      */
-    public function getDataObject(): ?DataObject
+    public function getSourceObject(): ?ViewableData
     {
-        return $this->dataObject;
+        return $this->sourceObject;
     }
 
     /**
@@ -75,6 +81,7 @@ abstract class AbstractDecorator
      * @param array|null $additionalProperties
      * @return DBField
      * @throws ValidationException
+     * @throws Exception
      */
     public function getAttributes(?array $additionalProperties = null): DBField
     {
@@ -83,14 +90,9 @@ abstract class AbstractDecorator
             'data' => $data,
         ];
 
-        if ($this->shouldUseId()) {
-            if (array_key_exists('ID', $data)) {
-                // ID is provided via a property
-                $attributes['id'] = $data['ID'];
-            } elseif ($this->getDataObject() !== null) {
-                // ID can be taken from model
-                $attributes['id'] = $this->getDataObject()->getUniqueKey();
-            }
+        // extract ID and copy it over to a separate attribute, so it could be processed easily by events
+        if (array_key_exists('ID', $data)) {
+            $attributes['id'] = $data['ID'];
         }
 
         foreach ($this->getComponentConfig()->getInteractions() as $interaction) {
@@ -99,8 +101,8 @@ abstract class AbstractDecorator
 
         $parts = [];
 
+        // Make sure attribute encoding is applied in all cases as some data may be managed by content authors
         foreach ($attributes as $key => $attribute) {
-            // Make sure attribute encoding is applied in all cases as some data is managed by content authors
             if (is_array($attribute)) {
                 $parts[] = sprintf(
                     "data-layer-%s='%s'",
@@ -132,6 +134,16 @@ abstract class AbstractDecorator
     }
 
     /**
+     * Create tracking data as per component specification
+     * The priority order of field resolution is as follows:
+     *
+     * 1 - identifier field type
+     * 2 - additional properties
+     * 3 - directly from decorator
+     * 4 - from field mapping
+     * 5 - from source object
+     * 6 - from default value
+     *
      * @param array|null $additionalProperties
      * @return array
      * @throws ValidationException
@@ -144,22 +156,14 @@ abstract class AbstractDecorator
         foreach ($config->getFields() as $field) {
             $key = $field->getKey();
             $type = $field->getType();
-            $dataObject = $this->getDataObject();
+            $sourceObject = $this->getSourceObject();
 
-            $value = $this->getFieldValue($config->getComponentKey(), $field, $dataObject);
+            $value = $this->getFieldValue($config->getComponentKey(), $field);
 
             // Identifier types are expected to be provided via static configuration
             // These are never populated by other means
             if ($type === Field::TYPE_IDENTIFIER) {
                 $results[$key] = $this->castValue(Field::TYPE_STRING, $field->getValue());
-
-                continue;
-
-            }
-
-            // The value has been declared via the decorator
-            if ($value !== self::VALUE_UNDEFINED) {
-                $results[$key] = $this->castValue($type, $value);
 
                 continue;
             }
@@ -171,8 +175,15 @@ abstract class AbstractDecorator
                 continue;
             }
 
+            // The value has been declared via the decorator
+            if ($value !== self::VALUE_UNDEFINED) {
+                $results[$key] = $this->castValue($type, $value);
+
+                continue;
+            }
+
             // If the value has been specifically mapped
-            $mappedValue = $this->getValueFromMapping($key, $dataObject);
+            $mappedValue = $this->getValueFromMapping($key);
 
             if ($mappedValue !== self::VALUE_UNDEFINED) {
                 $results[$key] = $this->castValue($type, $mappedValue);
@@ -181,9 +192,9 @@ abstract class AbstractDecorator
             }
 
             // Check if the value is a field on the Data Object
-            if ($dataObject && $dataObject->hasField($key)) {
+            if ($sourceObject && $sourceObject->hasField($key)) {
                 // We've got a direct field (or a field populated by other means like an extension or a get method)
-                $results[$key] = $this->castValue($type, $dataObject->{$key});
+                $results[$key] = $this->castValue($type, $sourceObject->{$key});
 
                 continue;
             }
@@ -197,12 +208,14 @@ abstract class AbstractDecorator
             }
 
             // Finally throw
-            throw new InvalidArgumentException(sprintf(
-                'Unable to find %s field on %s class for %s',
-                $key,
-                $dataObject ? get_class($dataObject) : 'null',
-                $this->getComponentConfig()->getComponentKey(),
-            ));
+            throw new ValidationException(
+                sprintf(
+                    'Unable to find %s field on %s class for %s',
+                    $key,
+                    $sourceObject ? get_class($sourceObject) : 'null',
+                    $this->getComponentConfig()->getComponentKey(),
+                )
+            );
         }
 
         return $results;
@@ -211,71 +224,68 @@ abstract class AbstractDecorator
     /**
      * Return `static::VALUE_UNDEFINED` if you would like to mark the value as undefined
      *
-     * @return mixed|string|null
+     * @param string $componentKey
+     * @param Field $field
+     * @return mixed
      */
-    protected function getFieldValue(string $componentKey, Field $field, ?DataObject $dataObject)
+    protected function getFieldValue(string $componentKey, Field $field)
     {
         return self::VALUE_UNDEFINED;
     }
 
-    /*
-     * Disable adding an ID if you've got components without IDs
+    /**
+     * Get field mapping based on the specified decorator map
+     *
+     * @param string $componentKey
+     * @return array
      */
-    protected function shouldUseId(): bool
+    protected function getMapping(string $componentKey): array
     {
-        return true;
-    }
+        $genericMapping = (array) $this->config()->get('field_map');
+        $sourceObject = $this->getSourceObject();
 
-    /*
-     * Represents the combination of generic values and component values
-     * for the specified component
-     */
-    protected function getMapping(?string $componentKey = null): array
-    {
-        $genericValues = $this->config()->get('generic_values');
-
-        if (!$componentKey) {
-            return $genericValues;
+        if ($sourceObject === null) {
+            // We don't have any source object available - use generic mapping
+            return $genericMapping;
         }
 
-        $componentMapping = $this->config()->get('component_values');
+        $decorators = (array) $sourceObject->config()->get('data_layer_decorators');
 
-        // Do we have mapping for our component?
-        if (!is_array($componentMapping) || !array_key_exists($componentKey, $componentMapping)) {
-            // The answer is no, so we just use the generic mapping
-            return $genericValues;
+        if (!array_key_exists($componentKey, $decorators)) {
+            // We don't have any source object specific mapping - use generic mapping
+            return $genericMapping;
         }
 
-        // Combine generic values with our component specific values
-        return array_merge($genericValues, $componentMapping[$componentKey]);
+        $specificMapping = (array) $decorators[$componentKey];
+
+        // Merge mappings -  specific mapping overrides the generic mapping
+        return $specificMapping + $genericMapping;
     }
 
     /**
-     * Based on a key, get the value for the mapping
+     * Get the value for the mapping based on specified key
      *
      * @param string $key
-     * @param DataObject|null $dataObject
-     * @return mixed|DataObject|DBField|null
+     * @return mixed|ViewableData|DBField|null
      * @throws ValidationException
      */
-    protected function getValueFromMapping(string $key, ?DataObject $dataObject)
+    protected function getValueFromMapping(string $key)
     {
+        $sourceObject = $this->getSourceObject();
         $mapping = $this->getMapping($this->getComponentConfig()->getComponentKey());
 
-        if (!array_key_exists($key, $mapping) || !$dataObject) {
+        if (!array_key_exists($key, $mapping) || !$sourceObject) {
             return self::VALUE_UNDEFINED;
         }
 
         $valueKey = $mapping[$key];
         // We've got a field that has been mapped
         $methods = explode('.', $valueKey);
-        $result = $dataObject;
+        $result = $sourceObject;
 
-        while (count($methods) > 0) {
-            $method = array_shift($methods);
-
+        while ($method = array_shift($methods)) {
             if ($result->hasMethod($method)) {
-                $result = $dataObject->{$method}();
+                $result = $sourceObject->{$method}();
 
                 continue;
             }
@@ -287,20 +297,24 @@ abstract class AbstractDecorator
                 continue;
             }
 
-            throw new InvalidArgumentException(sprintf(
-                'Unable to find mapped field %s on %s class for %s',
-                $method,
-                get_class($result),
-                $valueKey,
-            ));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Unable to find mapped field %s on %s class for %s',
+                    $method,
+                    get_class($result),
+                    $valueKey,
+                )
+            );
         }
 
-        if ($result instanceof DataObject) {
-            throw new InvalidArgumentException(sprintf(
-                'Mapping "%s" returned a data object (%s)',
-                $valueKey,
-                get_class($result)
-            ));
+        if ($result instanceof ViewableData) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Mapping "%s" returned a data object (%s)',
+                    $valueKey,
+                    get_class($result)
+                )
+            );
         }
 
         return $result;

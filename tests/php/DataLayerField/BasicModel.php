@@ -23,4 +23,9 @@ class BasicModel extends DataObject implements TestOnly
         'Title' => 'Varchar',
         'Location' => 'Int',
     ];
+
+    public function getTestRelation(): self
+    {
+        return $this;
+    }
 }

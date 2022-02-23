@@ -14,8 +14,21 @@ class Field
 
     use Injectable;
 
+    /**
+     * Basic type - string
+     */
     public const TYPE_STRING = 'String';
+
+    /**
+     * Basic type - integer
+     */
     public const TYPE_INTEGER = 'Integer';
+
+    /**
+     * Special type - identifier
+     * This is a string populated from the specifications
+     * Does not support populating the value from other sources
+     */
     public const TYPE_IDENTIFIER = 'Identifier';
 
     /**

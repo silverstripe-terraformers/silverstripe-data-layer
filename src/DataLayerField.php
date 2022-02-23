@@ -4,10 +4,10 @@ namespace SilverStripe\DataLayer;
 
 use Serializable;
 use SilverStripe\DataLayer\DataComponentDecorators\DecoratorService;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\View\ViewableData;
 
 /**
  * This field represents mutable state of @see DataLayerExtension::DataLayerAttributes()
@@ -17,9 +17,9 @@ use SilverStripe\ORM\ValidationException;
 class DataLayerField extends DBHTMLText implements Serializable
 {
     /**
-     * @var DataObject|null
+     * @var ViewableData|null
      */
-    protected $model = null;
+    protected $sourceObject = null;
 
     /**
      * @var string|null
@@ -32,12 +32,12 @@ class DataLayerField extends DBHTMLText implements Serializable
     protected $extraProperties = [];
 
     /**
-     * @param DataObject|null $model
+     * @param ViewableData|null $sourceObject
      * @return $this
      */
-    public function setModel(?DataObject $model): self
+    public function setSourceObject(?ViewableData $sourceObject): self
     {
-        $this->model = $model;
+        $this->sourceObject = $sourceObject;
 
         return $this;
     }
@@ -54,6 +54,9 @@ class DataLayerField extends DBHTMLText implements Serializable
     }
 
     /**
+     * Add additional properties to the data set of this field
+     * Useful when overriding default values
+     *
      * @param array $properties
      * @return $this
      */
@@ -67,6 +70,9 @@ class DataLayerField extends DBHTMLText implements Serializable
     }
 
     /**
+     * Get an immutable version of this field
+     * Useful for field serialisation
+     *
      * @return DBField|null
      * @throws ValidationException
      */
@@ -75,7 +81,7 @@ class DataLayerField extends DBHTMLText implements Serializable
         return DecoratorService::singleton()->process(
             DecoratorService::TYPE_ATTRIBUTES,
             $this->componentKey,
-            $this->model,
+            $this->sourceObject,
             $this->extraProperties
         );
     }
