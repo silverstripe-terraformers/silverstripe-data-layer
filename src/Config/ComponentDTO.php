@@ -21,7 +21,12 @@ class ComponentDTO
     /**
      * @var Field[]
      */
-    private $fields = [];
+    private $fieldsSpecifications = [];
+
+    /**
+     * @var Field[]|null
+     */
+    private $fields = null;
 
     /**
      * @var string|null
@@ -54,11 +59,11 @@ class ComponentDTO
         }
 
         foreach ($specification['fields'] as $field) {
-            $this->fields[$field['key']] = Field::create(
+            $this->fieldsSpecifications[] = [
                 $field['key'],
                 $field['type'],
-                $field['value'] ?? null
-            );
+                $field['value'] ?? null,
+            ];
         }
     }
 
@@ -73,8 +78,10 @@ class ComponentDTO
             return;
         }
 
+        $fields = $this->getFields();
+
         foreach ($component->getFields() as $fieldId => $field) {
-            if (array_key_exists($fieldId, $this->fields)) {
+            if (array_key_exists($fieldId, $fields)) {
                 // We've already overwritten this field - bail out
                 continue;
             }
@@ -102,6 +109,21 @@ class ComponentDTO
      */
     public function getFields(): array
     {
+        // Initialise field objects
+        if ($this->fields === null) {
+            $this->fields = [];
+
+            foreach ($this->fieldsSpecifications as $data) {
+                [$key, $type, $value] = $data;
+
+                $this->fields[$key] = Field::create(
+                    $key,
+                    $type,
+                    $value ?? null
+                );
+            }
+        }
+
         return $this->fields;
     }
 

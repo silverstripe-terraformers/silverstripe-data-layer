@@ -1,6 +1,6 @@
 {
     "name": "silverstripe/data-layer",
-    "description": "Consistent and flexible data capture for your website.",
+    "description": "Flexible data capture solution for your website.",
     "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",

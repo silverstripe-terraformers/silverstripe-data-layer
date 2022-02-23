@@ -2,7 +2,7 @@
 
 namespace SilverStripe\DataLayer;
 
-use SilverStripe\Dev\Debug;
+use SilverStripe\ORM\ValidationException;
 use SilverStripe\View\TemplateGlobalProvider;
 
 /**
@@ -18,18 +18,20 @@ class TemplateHelper implements TemplateGlobalProvider
     }
 
     /**
+     * Get Data Layer attributes for a generic component
+     * This covers the cases where there is no data source and all data is populated via a template
+     *
      * @param string|null $componentKey
-     * @return DataLayerField|null
+     * @return DataLayerField
+     * @throws ValidationException
      */
-    public static function getGenericDataLayerAttributes(?string $componentKey): ?DataLayerField
+    public static function getGenericDataLayerAttributes(?string $componentKey): DataLayerField
     {
-        // You never know how bad the data you'll get is
         if (!$componentKey) {
-            Debug::message('$DataLayerAttributes called without a Component ID');
-
-            return null;
+            throw new ValidationException('$GenericDataLayerAttributes called without a component key');
         }
 
-        return DataLayerField::create('data-layer-field-generic')->setComponentKey($componentKey);
+        return DataLayerField::create(sprintf('data-layer-field-generic-%s', $componentKey))
+            ->setComponentKey($componentKey);
     }
 }

@@ -1,0 +1,6 @@
+---
+Name: silverstripe-data-layer
+---
+SilverStripe\ORM\DataObject:
+  extensions:
+    DataLayerExtension: SilverStripe\DataLayer\DataLayerExtension
