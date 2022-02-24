@@ -1,4 +1,4 @@
-import { addComponent, getComponent } from "..";
+import { addComponent, getComponent } from "../index";
 
 export const getDataLayerData = (element) => {
   const elementId = element.getAttribute("data-layer-id");

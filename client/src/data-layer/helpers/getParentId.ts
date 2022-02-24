@@ -1,4 +1,4 @@
-import { getDataFromElement } from "..";
+import { getDataFromElement } from "../index";
 
 export const getParentId = (childElement?: Element): string | null => {
   // if a ParentID is set, bypass lookup

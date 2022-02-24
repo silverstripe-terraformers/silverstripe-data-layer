@@ -13,7 +13,7 @@ import { RaygunMessage, RequestMethod } from "./types";
 const raygunAPIUrl = "https://api.raygun.com/entries";
 const raygunAPIKeyHeader = "X-ApiKey";
 // @ts-ignore: Global var refer to the readme for details
-const apiKey = window?.TNZ?.RaygunAPIkey;
+const apiKey = window?.Silverstripe?.RaygunAPIkey;
 
 export const sendErrorToRaygun = (e: Error) => {
   const queryEntries = window.URLSearchParams ? new URLSearchParams(window?.location?.search).entries() : [];
@@ -24,7 +24,7 @@ export const sendErrorToRaygun = (e: Error) => {
     occurredOn: new Date().toISOString(),
     details: {
       client: {
-        name: "tnz js logger",
+        name: "silverstripe js logger",
         //@ts-ignore: global BUILD_VERSION provided by webpack define
         version: BUILD_VERSION,
       },

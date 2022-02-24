@@ -257,14 +257,14 @@ This script needs to be placed into the `<head>` of your page template.
 <script type="text/javascript">
   var trackingData = $PageTrackingData.RAW; // @see SiteTreeTrackingExtension::getPageTrackingData()
 
-  window.tnzDataLayer.push(trackingData);
+  window.silverstripeDataLayer.push(trackingData);
 
   <%-- This is based on the users cookie so can't be stored statically --%>
-  window.tnzDataLayer.push({
+  window.silverstripeDataLayer.push({
       page: { user: { country: TNZ.Util.getUsersCountryCode() } },
   });
 
-  window.tnzDataLayer.push({
+  window.silverstripeDataLayer.push({
     event: "page_view",
   });
 </script>

@@ -1,5 +1,5 @@
-export const getDataLayer = (): typeof window.tnzDataLayer => {
-  return window.tnzDataLayer;
+export const getDataLayer = (): typeof window.silverstripeDataLayer => {
+  return window.silverstripeDataLayer;
 };
 
 export type InputEvent = {
@@ -23,7 +23,7 @@ export const add = (data: InputEvent | Data): number => getDataLayer().push(data
 
 // Get data by path (only works if the helper has been loaded)
 export const get = (path: string): InputEvent | Data | null => {
-  const helper = window.TNZ?.Tracking?.dataLayerHelper;
+  const helper = window.Silverstripe?.Tracking?.dataLayerHelper;
 
   // The helper has not loaded, we can not query it
   if (!helper) {

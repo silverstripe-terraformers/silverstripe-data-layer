@@ -1,10 +1,10 @@
 {
-  "name": "@tnz/logger",
+  "name": "@silverstripe/logger",
   "version": "1.0.0",
   "main": "index.ts",
   "license": "MIT",
   "dependencies": {
-    "@tnz/globals": "^1",
+    "@silverstripe/globals": "^1",
     "loglevel": "^1"
   }
 }

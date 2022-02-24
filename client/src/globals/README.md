@@ -1,0 +1,1 @@
+These are global window definitions that are shared across the codebase. This is only to be used to allow other packages to reference them. For example `@silverstripe/logger` needs to call `Silverstripe.Util.isDebugMode()` which we expose in this package
