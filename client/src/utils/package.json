@@ -1,6 +1,6 @@
 {
-    "name": "@tnz/utils",
-    "description": "Utility functions for the TNZ pattern library. Intended to replace js/global/_lib/tnzjslib/40-utils.js",
+    "name": "@silverstripe/utils",
+    "description": "Utility functions for your site's pattern library.",
     "version": "1.0.0",
     "main": "index.ts",
     "exports": {

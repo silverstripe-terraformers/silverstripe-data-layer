@@ -51,7 +51,7 @@ const attachAdapters = (adapters: Array<Adapter>) => {
   };
 
   // Attach the helper to a global so we can use it else where (e.g. in tests)
-  window.TNZ.Tracking.dataLayerHelper = new window.DataLayerHelper(dataLayer, { listener, listenToPast: true });
+  window.Silverstripe.Tracking.dataLayerHelper = new window.DataLayerHelper(dataLayer, { listener, listenToPast: true });
 };
 
 const adapterLoaded = (adapters: Array<Adapter>): Function => {
@@ -59,7 +59,7 @@ const adapterLoaded = (adapters: Array<Adapter>): Function => {
 
   return (id): void => {
     // Exit early if we've already created the data layer helper
-    if (window.TNZ.Tracking?.dataLayerHelper) return;
+    if (window.Silverstripe.Tracking?.dataLayerHelper) return;
 
     log.debug(`${id} adapter has loaded`);
     // Remove the adapter from our list of unloaded adapters
@@ -82,7 +82,7 @@ const adapterLoaded = (adapters: Array<Adapter>): Function => {
  */
 export const registerAdapters = (adapters: Array<Adapter>) => {
   // Register our adapter loaded function
-  window.TNZ.Tracking.adapterLoaded = adapterLoaded(adapters);
+  window.Silverstripe.Tracking.adapterLoaded = adapterLoaded(adapters);
 
   // Check if the adapters have already loaded
   const hasLoaded = adapters.filter((a) => a.hasLoaded()).length > 0;
@@ -97,7 +97,7 @@ export const registerAdapters = (adapters: Array<Adapter>) => {
   }
 
   // Register our adapters
-  window.TNZ.Tracking.adaptersToLoad = adapters.map((a) => a.id);
+  window.Silverstripe.Tracking.adaptersToLoad = adapters.map((a) => a.id);
 
   log.debug("Adapter connection setup, ready to load adapters");
 };

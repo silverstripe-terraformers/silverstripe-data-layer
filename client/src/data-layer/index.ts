@@ -19,9 +19,9 @@ type DataLayerHelper = {
 
 declare global {
   interface Window {
-    tnzDataLayer: Array<object>;
+    silverstripeDataLayer: Array<object>;
     DataLayerHelper: DataLayerHelper;
-    TNZ: {
+    Silverstripe: {
       Tracking: {
         dataLayerHelper: DataLayerHelper;
         adapterLoaded: Function | null;
@@ -31,7 +31,7 @@ declare global {
   }
 }
 
-window.TNZ.Tracking = window.TNZ.Tracking || ({} as any);
+window.Silverstripe.Tracking = window.Silverstripe.Tracking || ({} as any);
 
 const createDataLayer = (adapters: Array<Adapter>) => {
   registerAdapters(adapters);

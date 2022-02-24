@@ -1,6 +1,7 @@
 import * as log from "loglevel";
 import { Logger } from "loglevel";
 import { sendErrorToRaygun } from "./lib/raygun";
+import {Silverstripe} from "../globals";
 
 /**
  * Takes in a name of the logger, this is what gets prepended to the logger.
@@ -75,7 +76,7 @@ export const createLogger = (name: string): Logger => {
   log.setLevel(log.getLevel());
 
   // read url to set log level
-  if (TNZ.Util.isDebugMode()) {
+  if (Silverstripe.Util.isDebugMode()) {
     // show all messages in debug mode
     log.enableAll();
   } else {

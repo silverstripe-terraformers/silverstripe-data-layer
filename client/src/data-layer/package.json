@@ -1,5 +1,5 @@
 {
-  "name": "@tnz/data-layer",
+  "name": "@silverstripe/data-layer",
   "version": "1.0.0",
   "main": "index.ts",
   "exports": {
@@ -8,8 +8,8 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "@tnz/globals": "^1",
-    "@tnz/logger": "^1",
+    "@silverstripe/globals": "^1",
+    "@silverstripe/logger": "^1",
     "data-layer-helper": "google/data-layer-helper",
     "lodash": "^4.17.21"
   }

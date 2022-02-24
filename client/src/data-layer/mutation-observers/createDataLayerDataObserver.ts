@@ -3,7 +3,7 @@ import log from "../log";
 import { AttributeObserver } from "./AttributeObserver";
 import { getParentId } from "../helpers/getParentId";
 import { decodeRecursive } from "../helpers/decodeRecursive";
-import { debounce } from "@tnz/utils";
+import { debounce } from "@silverstripe/utils";
 import { ObserverCreator } from "./types";
 
 /**

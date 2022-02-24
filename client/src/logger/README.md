@@ -1,6 +1,6 @@
-# TNZ Logger
+# Silverstripe Logger
 
-This is a small utility library for managing logs across the consumer site.
+This is a small utility library for managing logs across your site.
 
 It allows you to create prefixed logs, set log levels and it integrates with raygun
 
@@ -9,7 +9,7 @@ It allows you to create prefixed logs, set log levels and it integrates with ray
 the only export from the library is `createLogger`. This function takes a 'name' as its first and only argument. It returns an instance of [loglevel](https://github.com/pimterry/loglevel). Logs from this instance will be prefixed with the `name` supplied. For example:
 
 ```Javascript
-import { createLogger } from '@tnz/logger';
+import { createLogger } from '@silverstripe/logger';
 
 const log = createLogger('MyLog');
 
@@ -35,5 +35,5 @@ We are only sending very basic error log information to raygun - it is intended 
 Some variables are needed for this module to sucessfully funtion. Ideally we re-factor these out but at time of writing it is very difficult to provide environment variables to the JS build (see the Cloud Build limitations) so we provide them as global variables instead.
 
 - `BUILD_VERSION` is used to set the raygun client version (injected by webpack's define plugin)
-- `TNZ.RaygunAPIkey` must be present on the page and contain a valid Raygun crash reporting API key. If not provided, requests to raygun will return 403
-- `TNZ.Util.isDebugMode()` is used to determine the logging level - if `debug=1` is present in the url this will return `true`
+- `Silverstripe.RaygunAPIkey` must be present on the page and contain a valid Raygun crash reporting API key. If not provided, requests to raygun will return 403
+- `Silverstripe.Util.isDebugMode()` is used to determine the logging level - if `debug=1` is present in the url this will return `true`

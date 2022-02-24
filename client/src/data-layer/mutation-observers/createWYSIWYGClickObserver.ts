@@ -22,7 +22,7 @@ type LinkEvent = {
   OperatorName?: string | null;
   EditorReferral?: boolean;
   ParentID?: string | null;
-  TNZLinkType?: string | null;
+  LinkType?: string | null;
 };
 
 const getDataFromElement = (element): LinkEvent => {
@@ -31,7 +31,7 @@ const getDataFromElement = (element): LinkEvent => {
     Component: "generic/link/wysiwyg",
     LinkHref: element.getAttribute("href"),
     OperatorName: element.getAttribute("data-operatorname"),
-    TNZLinkType: element.getAttribute("data-tnzlinktype"),
+    LinkType: element.getAttribute("data-linktype"),
     EditorReferral: element.getAttribute("data-editorreferral"),
   } as LinkEvent;
 
